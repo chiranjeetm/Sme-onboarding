@@ -209,6 +209,7 @@ body { font-family: 'IBM Plex Sans', sans-serif; background: var(--bg); color: v
 </div>
 
 <script>
+// ── LIVE NETWORK DRIVER CONNECTIONS ──
 async function runOCR(context, inputEl) {
   const file = inputEl.files[0];
   if (!file) return;
@@ -252,7 +253,19 @@ function fillOCRFields(context, data) {
     document.getElementById('co-name-en').value = data.name_english || '';
     document.getElementById('co-name-ar').value = data.name_arabic || '';
     document.getElementById('co-tl-no').value = data.licence_number || '';
-    document.getElementById('co-emirate').value = data.emirate || 'Dubai';
+    
+    // SAFE REGIONAL ACCENT DROPDOWN CONTROLLER
+    if (data.emirate) {
+      const emSelect = document.getElementById('co-emirate');
+      const normVal = data.emirate.trim().toLowerCase();
+      for (const opt of emSelect.options) {
+        if (opt.value.toLowerCase() === normVal || opt.text.toLowerCase().includes(normVal)) {
+          emSelect.value = opt.value;
+          break;
+        }
+      }
+    }
+    
     document.getElementById('co-expiry').value = data.expiry_date || '';
     if(data.establishment_date) document.getElementById('co-estab').value = data.establishment_date;
     document.getElementById('co-name-en').classList.add('ocr-filled');
@@ -305,6 +318,7 @@ function renderSummaryData() {
   `;
 }
 
+// ── UTILITY CONTROLLERS ──
 function collectData() {
   return {
     company: { nameEn: document.getElementById('co-name-en').value, tlNo: document.getElementById('co-tl-no').value, domicile: document.getElementById('co-emirate').value },
